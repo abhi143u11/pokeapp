@@ -11,12 +11,6 @@ import 'dart:convert';
 
 import 'models/workerrating.dart';
 
-List<HitsArray> hitsArrayFromJson(String str) =>
-    List<HitsArray>.from(json.decode(str).map((x) => HitsArray.fromJson(x)));
-
-String hitsArrayToJson(List<HitsArray> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
-
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
@@ -67,13 +61,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<List<WorkerRating>> _getData() async {
     final url =
         'http://192.168.0.107/acsphp/provider_rating.php?service_provider_id=2';
-    String jsonString =
-        ' [    {      "tt": 1567566438144,    "status": "0",    "count": 2257056,    "status_count": 2257053    }    ,    {    "tt": 1567566438144,    "status": "1",    "count": 2257056,    "status_count": 3    }    ]';
     var response = await http.get(url);
     var values = workerRatingFromJson(response.body);
-
-    //var values = hitsArrayFromJson(jsonString);
-    //throw new Exception("Danger Will Robinson!!!");
 
     await new Future.delayed(new Duration(seconds: 1));
 
@@ -126,20 +115,4 @@ class _MyHomePageState extends State<MyHomePage> {
           ).p16().card.roundedSM.color(Color.fromRGBO(30, 30, 30, 1)).p8.make();
         });
   }
-} /*new Column(
-          children: <Widget>[
-            /*new ListTile(
-              title:
-                  new Text(' count ${values[index].customerName.toString()}'),
-              subtitle:
-                  new Text('status count ${values[index].feedback.toString()}'),
-            ),*/
-            new Divider(
-              height: 2.0,
-            ),
-          ],
-        );
-      },
-    );
-  }
-}*/
+}
