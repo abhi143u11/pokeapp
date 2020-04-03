@@ -1,118 +1,85 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:velocity_x/velocity_x.dart';
-// To parse this JSON data, do
+import 'package:pokeapp/result.dart';
+
+import 'quiz.dart';
+
 //
 //     final hitsArray = hitsArrayFromJson(jsonString);
 
-import 'dart:convert';
-
-import 'models/workerrating.dart';
-
 void main() => runApp(new MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Flutter Demo',
-      theme: new ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: new MyHomePage(),
-    );
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var _questionIndex = 0;
+  var _totalScore = 0;
+
+  void _resetQuiz() {
+    setState(() {
+      _questionIndex = 0;
+      _totalScore = 0;
+    });
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => new _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    var futureBuilder = new FutureBuilder(
-      future: _getData(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return new Text('loading...');
-          default:
-            if (snapshot.hasError)
-              return new Text('Error: ${snapshot.error}');
-            else
-              return createListView(context, snapshot);
-        }
+    final _questions = const [
+      {
+        'questionText': 'What\'s your favorite color?',
+        'answers': [
+          {'text': 'Black', 'score': 10},
+          {'text': 'Red', 'score': 5},
+          {'text': 'Green', 'score': 3},
+          {'text': 'White', 'score': 1},
+        ],
       },
-    );
+      {
+        'questionText': 'What\'s your favorite animal?',
+        'answers': [
+          {'text': 'Rabbit', 'score': 3},
+          {'text': 'Snake', 'score': 11},
+          {'text': 'Elephant', 'score': 5},
+          {'text': 'Lion', 'score': 9},
+        ],
+      },
+      {
+        'questionText': 'Who\'s your favorite instructor?',
+        'answers': [
+          {'text': 'Max', 'score': 1},
+          {'text': 'Max', 'score': 1},
+          {'text': 'Max', 'score': 1},
+          {'text': 'Max', 'score': 1},
+        ],
+      },
+    ];
 
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Home Page"),
+    void _answerQuestion(int score) {
+      _totalScore = _totalScore + score;
+      print(_totalScore);
+      setState(() {
+        _questionIndex = _questionIndex + 1;
+      });
+      print(_questionIndex);
+    }
+
+    return MaterialApp(
+        home: Scaffold(
+      appBar: AppBar(
+        title: Text('First App'),
       ),
-      body: futureBuilder,
-    );
-  }
-
-  Future<List<WorkerRating>> _getData() async {
-    final url =
-        'http://192.168.0.107/acsphp/provider_rating.php?service_provider_id=2';
-    var response = await http.get(url);
-    var values = workerRatingFromJson(response.body);
-
-    await new Future.delayed(new Duration(seconds: 1));
-
-    return values;
-  }
-
-  Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
-    List<WorkerRating> values = snapshot.data;
-    return new ListView.builder(
-        itemCount: values.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  "${values[index].customerName.toString()}"
-                      .text
-                      .white
-                      .medium
-                      .make(),
-                  "${values[index].rating.toString()}"
-                      .text
-                      .medium
-                      .orange500
-                      .make(),
-                ],
-              ),
-              10.heightBox,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  "${values[index].createdDate.toString()}"
-                      .text
-                      .color(
-                        Color.fromRGBO(242, 242, 242, 1),
-                      )
-                      .make(),
-                  10.heightBox,
-                  '${values[index].feedback.toString()}'
-                      .text
-                      .color(
-                        Color.fromRGBO(242, 242, 242, 1),
-                      )
-                      .make(),
-                ],
-              ),
-            ],
-          ).p16().card.roundedSM.color(Color.fromRGBO(30, 30, 30, 1)).p8.make();
-        });
+      body: _questionIndex < _questions.length
+          ? Quiz(
+              answerQuestion: _answerQuestion,
+              questionIndex: _questionIndex,
+              questions: _questions,
+            )
+          : Result(
+              resultScore: _totalScore,
+              resetHandler: _resetQuiz,
+            ),
+    ));
   }
 }

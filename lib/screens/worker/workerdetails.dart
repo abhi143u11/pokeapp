@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:pokeapp/models/workerrating.dart';
 import 'package:http/http.dart' as http;
 import 'package:velocity_x/velocity_x.dart';
@@ -93,7 +90,7 @@ class _WorkerDetailsState extends State<WorkerDetails> {
     );
   }
 
-  Widget CustomerReview() {
+  Widget customerReview() {
     return Column(
       children: <Widget>[
         Row(
